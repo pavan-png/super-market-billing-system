@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>UPI Payment</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>UPI Payment</h2>
+            <div>
+                <a href="/billing" class="btn btn-secondary me-2">New Bill</a>
+                <a href="/logout" class="btn btn-danger">Logout</a>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <h4>Scan to Pay</h4>
+            <div id="upiQR" class="mx-auto mb-3" style="width: 200px; height: 200px;"></div>
+            <p><strong>Bill Amount: ₹<span id="billAmount"></span></strong></p>
+            <p><strong>Bank: Supermart via Union Bank</strong></p>
+            
+            <div class="alert alert-info">
+                <strong>Instructions:</strong><br>
+                1. Ask customer to scan the QR with any UPI app (PhonePe, Paytm, BHIM work best).<br>
+                2. Amount is pre-filled – customer enters PIN to pay.<br>
+                3. If Google Pay opens briefly and returns without payment screen, it's a known issue with personal UPI IDs – try PhonePe instead.<br>
+                4. Verify payment in your UPI app (check for exact amount and order note).<br>
+                5. Once confirmed, click "Complete Order".
+            </div>
+            <!-- Optional Fallback: Your Static QR (uncomment and upload image to static/images/static-qr.png) -->
+             <div class="mt-4">
+                <h5>Fallback: If Dynamic QR Fails</h5>
+                <img src="/images/static-qr.png" alt="Static UPI QR" style="width:200px;">
+                <p>Scan this static QR and manually enter ₹<span id="billAmountFallback"></span></p>
+            </div> 
+            <button onclick="completeOrder()" class="btn btn-primary w-100 mt-3">Complete Order</button>
+        </div>
+    </div>
+
+    <script>
+        const pendingOrder = JSON.parse(localStorage.getItem('pendingOrder'));
+        if (!pendingOrder) {
+            alert('No pending order found. Redirecting to billing.');
+            window.location.href = '/billing';
+        }
+
+        const orderId = pendingOrder.orderId;
+        const grandTotal = pendingOrder.grandTotal;
+        const currentItems = pendingOrder.currentItems;
+
+        document.getElementById('billAmount').textContent = grandTotal.toFixed(2);
+        // document.getElementById('billAmountFallback').textContent = grandTotal.toFixed(2); // Uncomment if using fallback
+
+        const upiId = 'mohanpavankalyan52@okhdfcbank';  // ← Your updated VPA (double-check spelling/case)
+        const merchantName = 'Supermart Billing via Union Bank';
+        const transactionNote = `Order ${orderId} - Total ₹${grandTotal.toFixed(2)}`;
+
+        const upiUrl = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(merchantName)}&am=${grandTotal.toFixed(2)}&cu=INR&tn=${encodeURIComponent(transactionNote)}&tr=${encodeURIComponent(orderId)}&mode=00`;
+
+        new QRCode(document.getElementById('upiQR'), {
+            text: upiUrl,
+            width: 200,
+            height: 200,
+            colorDark: "#000000",
+            colorLight: "#ffffff"
+        });
+
+        function completeOrder() {
+            if (confirm('Have you verified the UPI payment?')) {
+                const order = {
+                    orderId: orderId,
+                    items: currentItems.map(item => ({
+                        product: item.product,
+                        quantity: item.quantity,
+                        subtotal: item.subtotal
+                    }))
+                };
+
+                fetch('/api/orders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(order)
+                })
+                .then(response => response.json())
+                .then(savedOrder => {
+                    alert('Order completed successfully!');
+                    localStorage.removeItem('pendingOrder');
+                    window.location.href = '/billing';
+                })
+                .catch(error => {
+                    alert('Error submitting order: ' + error.message);
+                });
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

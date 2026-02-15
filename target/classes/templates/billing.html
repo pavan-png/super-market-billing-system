@@ -1,0 +1,87 @@
+<!-- Updated billing.html (full replacement) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Billing</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <!-- Logout Button at Top-Right -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Supermarket Billing</h2>
+            <a href="/logout" class="btn btn-danger">Logout</a>
+        </div>
+
+        <div class="alert alert-info">
+            <strong>Order ID:</strong> <span id="orderIdDisplay"></span>
+        </div>
+
+        <div id="addItemSection">
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <input type="number" id="productId" class="form-control" placeholder="Product ID" required>
+                </div>
+                <div class="col-md-4">
+                    <input type="number" id="quantity" class="form-control" placeholder="Quantity" required>
+                </div>
+                <div class="col-md-4">
+                    <button onclick="addItem()" class="btn btn-success w-100">Add Item</button>
+                </div>
+            </div>
+
+            <table class="table table-striped" id="billingTable">
+                <thead>
+                    <tr>
+                        <th>Product ID</th>
+                        <th>Product Name</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Subtotal</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <h4 id="grandTotal" class="text-end">Grand Total: 0.00</h4>
+            <button onclick="proceedToCheckout()" class="btn btn-primary w-100">Proceed to Checkout</button>
+        </div>
+
+        <!-- Payment Section (hidden initially) -->
+        <div id="paymentSection" class="mt-4" style="display: none;">
+            <h4>Payment Method</h4>
+            <div class="row">
+                <div class="col-md-6">
+                    <button onclick="selectCash()" class="btn btn-success w-100">Cash</button>
+                </div>
+                <div class="col-md-6">
+                    <button onclick="selectUPI()" class="btn btn-info w-100">UPI</button>
+                </div>
+            </div>
+
+            <div id="cashSection" class="mt-4" style="display: none;">
+                <p id="cashTotal" class="text-center fw-bold">Total Amount: ₹<span id="totalAmount">0.00</span></p>
+                <div class="mb-3">
+                    <label>Amount Received from Customer</label>
+                    <input type="number" id="amountReceived" class="form-control" placeholder="e.g. 800" step="0.01">
+                </div>
+                <div id="changeDisplay" class="alert alert-success" style="display: none;"></div>
+                <button onclick="completeOrder()" class="btn btn-primary w-100">Complete Order</button>
+            </div>
+        </div>
+
+        <div id="successSection" class="mt-4" style="display: none;">
+            <div class="alert alert-success">
+                <h4>Order Completed Successfully!</h4>
+                <p id="successMessage"></p>
+            </div>
+            <button onclick="startNewOrder()" class="btn btn-secondary">Start New Order</button>
+        </div>
+    </div>
+
+    <script src="/js/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
