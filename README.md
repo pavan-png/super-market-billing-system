@@ -22,7 +22,7 @@ A complete **Supermarket Billing Web Application** built using **Spring Boot**, 
 |-------|------------|
 | Backend | Spring Boot |
 | Frontend | Thymeleaf + HTML + CSS |
-| Database | MySQL / H2 |
+| Database | Oracle Database |
 | Build Tool | Maven |
 | Java Version | 17+ |
 | Architecture | MVC Pattern |
